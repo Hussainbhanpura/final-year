@@ -13,8 +13,7 @@ const studentSchema = new mongoose.Schema({
   grade: {
     type: String,
     required: true,
-  },
-  // Add more fields as needed
+  }
 });
 
 const Student = mongoose.model("Student", studentSchema);

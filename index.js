@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const bookRoutes = require("./routes/bookRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const rentalRoutes = require("./routes/rentalRoutes");
+const { registerUser, loginUser } = require('./controllers/authController');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,10 +26,14 @@ mongoose
   .catch((err) => console.log(err));
 
 // Routes;
-// app.use("/auth", authRoutes);
+// app.use("/login", authRoutes);
 app.use("/books", bookRoutes);
 app.use("/students", studentRoutes);
 app.use("/rentals", rentalRoutes);
+
+// Mount authentication routes
+app.post('/api/register', registerUser);
+app.post('/api/login', loginUser);
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
