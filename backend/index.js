@@ -6,13 +6,17 @@ const bookRoutes = require("./routes/bookRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const rentalRoutes = require("./routes/rentalRoutes");
 const { registerUser, loginUser } = require('./controllers/authController');
+const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors({
+  origin:"http://localhost:3000",
+}))
 
 // Connect to MongoDB
 mongoose

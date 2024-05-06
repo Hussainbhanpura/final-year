@@ -6,6 +6,7 @@ import BookList from "./components/BookList";
 import StudentList from "./components/StudentList";
 import RentalList from "./components/RentalList";
 import HomePage from "./Homepage";
+import EditBook from "./EditBook";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/books" element={<BookList />} />
           <Route path="/students" element={<StudentList />} />
           <Route path="/rentals" element={<RentalList />} />
+          <Route path="/edit-book/:id" element={<EditBook />} />
         </Routes>
       </div>
     </Router>
