@@ -17,7 +17,6 @@ function EditBook() {
     async function fetchBook(id) {
       try {
         const response = await axiosInstance.get(`books/${id}`);
-        console.log(response.data[0].title);
         setTitle(response.data[0].title);
         setAuthor(response.data[0].author);
         setQuantity(response.data[0].quantity);
