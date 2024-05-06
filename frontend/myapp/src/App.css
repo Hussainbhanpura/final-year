@@ -1,0 +1,10 @@
+.navi{
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.container-fluid{
+    height: 100vh;
+    left: 0;
+}
