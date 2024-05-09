@@ -23,12 +23,13 @@ const getStudentById = async (req, res) => {
 };
 
 const createStudent = async (req, res) => {
-  const { name, grade, isbn } = req.body;
+  const { name, grade, isbn,bookRented } = req.body;
   try {
     const student = new Student({
       name,
       grade,
       isbn,
+      bookRented
     });
     await student.save();
     res.status(201).json(student);

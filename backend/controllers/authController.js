@@ -32,6 +32,7 @@ const registerUser =  async (req, res) => {
       if (error) throw error;
       res.header('Authorization', token).json({ token });
       res.json({ token });
+      
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -71,6 +72,7 @@ const loginUser =  async (req, res) => {
       if (error) throw error;
       res.header('Authorization', token).json({ token });
       res.json({ token });
+      localStorage.setItem("token", token);
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -82,7 +84,27 @@ const logoutUser = async(req,res) =>{
   
 }
 
+const verifyToken = async(req, res) => {
+  const {token} = req.body;
+  if(!token){
+    res.status(401).json({ message: 'Login first'})
+  }
+  try {
+      const decoded = jwt.verify(token, "hinduja");
+      if (!decoded.user) { 
+          res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        else{
+          res.status(200).json({ message: 'Protected route accessed successfully' });
+        }
+  } catch (error) {
+      res.status(401).json({ message: 'Internal server error' });
+  }
+};
+
+
 module.exports = {
   registerUser,
   loginUser,
+  verifyToken
 };

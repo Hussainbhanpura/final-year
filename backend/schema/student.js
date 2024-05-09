@@ -13,7 +13,18 @@ const studentSchema = new mongoose.Schema({
   grade: {
     type: String,
     required: true,
+  },
+  booksRented: [
+    {_id : {
+      type : String,
+      required : true,
+    },
+    quantity : {
+      type : Number,
+      required : true,
+    }
   }
+  ],
 });
 
 const Student = mongoose.model("Student", studentSchema);

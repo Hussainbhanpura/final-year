@@ -7,7 +7,7 @@ const authMiddleware = (req, res, next) => {
   // Check if token exists
   if (!token) {
     // Redirect to login page
-    //return res.redirect('/login');
+    return res.redirect('/login');
   }
 
   try {

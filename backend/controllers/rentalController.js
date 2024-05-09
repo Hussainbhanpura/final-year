@@ -46,18 +46,25 @@ const getRentalsByStudentIsbn = async (req, res) => {
 };
 
 const rentBook = async (req, res) => {
-  const { bookId, studentId,rentalDate,returnDate } = req.body;
+  const { books, studentId } = req.body;
   try {
-    const rental = new Rental({
-      book: bookId,
-      student: studentId,
-      rentalDate,
-      returnDate
-    });
-    await rental.save();
-    res.status(201).json(rental);
+    const student = await Student.find({isbn : studentId});
+      books.map(async(b)=> {
+        student[0].booksRented.push(b);
+      })
+
+    await student[0].save();
+
+    for (const boo of books){
+      const b = await Book.find({ isbn : boo._id});
+      b[0].quantity =b[0].quantity - boo.quantity;
+      await b[0].save(); 
+    }
+
+    res.status(201).json({message : "Books rented successfully"});
   } catch (error) {
-    res.status(500).json({ message: "1 Internal server error" });
+
+    res.status(500).json({ message: "Internal server error" ,error});
   }
 };
 

@@ -5,7 +5,8 @@ const bodyParser = require("body-parser");
 const bookRoutes = require("./routes/bookRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const rentalRoutes = require("./routes/rentalRoutes");
-const { registerUser, loginUser } = require('./controllers/authController');
+// const {verifyToken} = require("./controllers/verifyToken");
+const { registerUser, loginUser,verifyToken } = require('./controllers/authController');
 const cors = require("cors");
 
 const app = express();
@@ -34,8 +35,10 @@ app.use("/students", studentRoutes);
 app.use("/rentals", rentalRoutes);
 
 // Mount authentication routes
+app.post('/api/verify', verifyToken)
 app.post('/api/register', registerUser);
 app.post('/api/login', loginUser);
+
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
