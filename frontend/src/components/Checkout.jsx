@@ -14,7 +14,6 @@ const cartFromLocalStorage = JSON.parse(
 );
 let price = 0;
 const totalfromLocalStorage = cartFromLocalStorage.map((b) => {
-  console.log(`Cart`, b);
   price = price + b.price * b.cartQuantity;
 });
 

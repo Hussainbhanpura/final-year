@@ -1,22 +1,34 @@
-import React, { useState } from "react";
 import "./Login.css";
 import axios from "axios";
 import BASE_URL from "../config.js";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthController";
 
 function Register() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [grade, setGrade] = useState("");
+  const [isbn, setIsbn] = useState("");
   const navigate = useNavigate();
+  const { storedToken } = useAuth();
+
+  const token = localStorage.getItem("token");
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log(username, password);
-    const userDetails = { username, password };
+    const userDetails = { name, grade, isbn };
     try {
-      const res = await axios.post(`${BASE_URL}/api/register`, userDetails);
+      const res = await axios.post(
+        `${BASE_URL}/students`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        },
+        userDetails
+      );
       console.log(res.data); // handle successful registration
-      navigate("/login"); // Redirect to login page after registration
+      navigate("/checkout"); // Redirect to login page after registration
     } catch (e) {
       window.alert("Error in registration");
     }
@@ -32,21 +44,21 @@ function Register() {
                 <div className="mb-md-5 mt-md-4 pb-5">
                   <h2 className="fw-bold mb-2 text-uppercase">Register</h2>
                   <p className="text-dark-50 mb-5">
-                    Please enter your desired username and password!
+                    Please enter your Name, Grade, and Isbn!
                   </p>
                   <div
                     data-mdb-input-init
                     className="form-outline form-dark mb-4"
                   >
                     <input
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                       type="text"
-                      id="typeUsername"
+                      id="typeName"
                       className="form-control form-control-lg"
                     />
-                    <label className="form-label" htmlFor="typeUsername">
-                      Username
+                    <label className="form-label" htmlFor="typeName">
+                      Name
                     </label>
                   </div>
                   <div
@@ -54,14 +66,29 @@ function Register() {
                     className="form-outline form-dark mb-4"
                   >
                     <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      id="typePassword"
+                      type="text"
+                      value={grade}
+                      onChange={(e) => setGrade(e.target.value)}
+                      id="typeGrade"
                       className="form-control form-control-lg"
                     />
-                    <label className="form-label" htmlFor="typePassword">
-                      Password
+                    <label className="form-label" htmlFor="typeGrade">
+                      Grade
+                    </label>
+                  </div>
+                  <div
+                    data-mdb-input-init
+                    className="form-outline form-dark mb-4"
+                  >
+                    <input
+                      type="text"
+                      value={isbn}
+                      onChange={(e) => setIsbn(e.target.value)}
+                      id="typeIsbn"
+                      className="form-control form-control-lg"
+                    />
+                    <label className="form-label" htmlFor="typeIsbn">
+                      Isbn
                     </label>
                   </div>
                   <button

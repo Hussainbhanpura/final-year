@@ -10,7 +10,7 @@ function Card({ data }) {
   const navigate = useNavigate();
 
   const handleDelete = async (id) => {
-    const res = await axios.delete(`${BASE_URL}/books/${id}`, {
+    const res = await axios.delete(`${BASE_URL}/students/${id}`, {
       headers: {
         Authorization: `${token}`,
       },
@@ -18,7 +18,7 @@ function Card({ data }) {
     window.location.reload();
   };
   const handleEdit = (id) => {
-    navigate(`/editbook/${id}`);
+    navigate(`/editstudent/${id}`);
   };
 
   return (
@@ -30,17 +30,17 @@ function Card({ data }) {
               <div className="row">
                 <div className="col-xs-6">
                   <h2>
-                    Manage <b>Books</b>
+                    Manage <b>Students</b>
                   </h2>
                 </div>
                 <div className="col-xs-6">
                   <a
-                    href="/addbook"
+                    href="/addstudent"
                     className="btn btn-success"
                     data-toggle="modal"
                   >
                     <i className="material-icons"></i>
-                    <span>Add New Book</span>
+                    <span>Add New Student</span>
                   </a>
                 </div>
               </div>
@@ -49,22 +49,18 @@ function Card({ data }) {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Author</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
+                  <th>Grade</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {data?.map((book, index) => (
-                  <tr key={book._id}>
-                    <td>{book.title}</td>
-                    <td>{book.author}</td>
-                    <td>{book.quantity}</td>
-                    <td>{book.price}</td>
+                {data?.map((student, index) => (
+                  <tr key={student._id}>
+                    <td>{student.name}</td>
+                    <td>{student.grade}</td>
                     <td>
                       <a
-                        onClick={() => handleEdit(book.isbn)}
+                        onClick={() => handleEdit(student.isbn)}
                         className="edit"
                         data-toggle="modal"
                       >
@@ -74,7 +70,7 @@ function Card({ data }) {
                       </a>
 
                       <a
-                        onClick={() => handleDelete(book._id)}
+                        onClick={() => handleDelete(student._id)}
                         className="delete"
                         data-toggle="modal"
                       >
@@ -85,38 +81,6 @@ function Card({ data }) {
                     </td>
                   </tr>
                 ))}
-
-                {/* {data.map((book, index) => (
-                  <tr key={book._id}>
-                    <td>{book.title}</td>
-                    <td> {book.author}</td>
-                    <td> {book.quantity}</td>
-                    <td>{book.price}</td>
-                    {
-                      <td>
-                        <a
-                          onClick={() => handleEdit(book.isbn)}
-                          className="edit"
-                          data-toggle="modal"
-                        >
-                          <i>
-                            <EditIcon />
-                          </i>
-                        </a>
-
-                        <a
-                          onClick={() => handleDelete(book._id)}
-                          className="delete"
-                          data-toggle="modal"
-                        >
-                          <i>
-                            <PersonRemoveIcon />
-                          </i>
-                        </a>
-                      </td>
-                    }
-                  </tr>
-                ))} */}
               </tbody>
             </table>
           </div>

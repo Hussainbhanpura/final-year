@@ -38,10 +38,14 @@ function EditBook() {
     fetchBook(id);
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (id) => {
     try {
       const updatedBook = { title, author, quantity, price };
-      const response = await axiosInstance.put(`/books/${id}`, updatedBook);
+      const response = await axiosInstance.put(`books/${id}`, updatedBook, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
       console.log(response.data); // handle successful update
     } catch (error) {
       console.error("Update error:", error.response.data.message);
@@ -93,10 +97,13 @@ function EditBook() {
               />
             </div>
             <div className="mt-5">
-              <MDBBtn>
-                {/* <MDBIcon fas icon="edit" size='xs' /> */}
-                <MDBIcon>Update</MDBIcon>
-              </MDBBtn>
+              <button
+                onClick={() => handleSubmit(id)}
+                type="button"
+                class="btn btn-primary"
+              >
+                Update
+              </button>
             </div>
           </form>
         )}

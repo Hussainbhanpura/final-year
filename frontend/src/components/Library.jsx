@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import BASE_URL from "../config.js";
 import Card from "./Card";
+import Card2 from "./Card2";
 
 function Dashboard() {
   const [books, setBooks] = useState([]);
@@ -24,7 +25,9 @@ function Dashboard() {
           <section className="overflow-auto mb-10 h-45 section-1">
             <Card data={books.data} />
           </section>
-          <section className="overflow-auto h-45 section-2"></section>
+          <section className="overflow-auto h-45 section-2">
+            <Card2 data={students.data} />
+          </section>
         </div>
       </div>
     </div>
