@@ -9,11 +9,24 @@ import {
 import axios from "axios";
 import BASE_URL from "../config.js";
 
+const cartFromLocalStorage = JSON.parse(
+  window.localStorage.getItem("checkout") || "[]"
+);
+let price = 0;
+const totalfromLocalStorage = cartFromLocalStorage.map((b) => {
+  console.log(`Cart`, b);
+  price = price + b.price * b.cartQuantity;
+});
+
 const CheckoutPage = () => {
   const [studentId, setStudentId] = useState("");
   const [bookId, setBookId] = useState("");
-  const [checkoutCart, setCheckoutCart] = useState([]);
-  const [total, setTotal] = useState(0);
+  const [checkoutCart, setCheckoutCart] = useState(cartFromLocalStorage);
+  const [total, setTotal] = useState(price);
+
+  useEffect(() => {
+    window.localStorage.setItem("checkout", JSON.stringify(checkoutCart));
+  }, [checkoutCart]);
 
   const handleCheckout = async () => {
     if (studentId === "" || checkoutCart.length < 1) {
@@ -71,7 +84,6 @@ const CheckoutPage = () => {
       const existingCart = checkoutCart.find(
         (book) => book._id === response.data[0]._id
       );
-      console.log(`ExistingCart`, existingCart);
       if (existingCart) {
         existingCart.cartQuantity++;
         setCheckoutCart([...checkoutCart]);

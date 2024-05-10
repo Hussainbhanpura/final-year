@@ -1,8 +1,14 @@
 import React from "react";
 import "font-awesome/css/font-awesome.min.css";
 import "../App.css";
+import { useNavigate } from "react-router-dom";
 
 function Navbar2() {
+  const navigate = useNavigate();
+  const logout = () => {
+    localStorage.setItem("token", null);
+    navigate("/login");
+  };
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -84,7 +90,11 @@ function Navbar2() {
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" aria-current="page" href="/logout">
+                    <a
+                      className="nav-link"
+                      aria-current="page"
+                      onClick={logout}
+                    >
                       Logout
                     </a>
                   </li>

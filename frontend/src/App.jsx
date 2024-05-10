@@ -9,6 +9,7 @@ import HomePage from "./components/Homepage";
 import EditBook from "./components/EditBook";
 import Navbar2 from "./components/Navbar2";
 import Login from "./components/Login";
+import Register from "./components/Register";
 import Library from "./components/Library";
 import Checkout from "./components/Checkout";
 import ShowNavbar from "./ShowNabar";
@@ -23,6 +24,7 @@ function App() {
           </ShowNavbar> */}
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/" element={<HomePage />}>
             <Route path="" element={<Library />} />
             <Route path="addbook" element={<AddBook />} />
