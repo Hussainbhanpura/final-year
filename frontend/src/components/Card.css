@@ -1,0 +1,53 @@
+/* EditBook.css */
+.table {
+    width: 100%;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .table th, .table td {
+    padding: 12px 15px;
+    text-align: left;
+  }
+  
+  .table thead th {
+    background-color: #007bff;
+    color: #ffffff;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+  }
+  
+  .table-bordered th, .table-bordered td {
+    border: 1px solid #dee2e6;
+  }
+
+  .btn-link {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    color: inherit; /* Inherits the text color */
+  }
+  
+  .btn-link:hover, .btn-link:focus {
+    background: none;
+    border: none;
+    color: #007bff;
+    text-decoration: underline; /* Optional: adds underline on hover/focus */
+  }
+
+  /* styles.css */
+.btn-success {
+    background-color: #2695bd; /* Bootstrap success green */
+    color: white;
+  }
+  
+  .btn-success:hover {
+    background-color: #2186ab; /* A darker green for hover */
+  }
