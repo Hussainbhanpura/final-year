@@ -25,13 +25,35 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     window.localStorage.setItem("checkout", JSON.stringify(checkoutCart));
+    let newTotal = 0;
+    checkoutCart.forEach((item) => {
+      newTotal += item.price * item.cartQuantity;
+    });
+    setTotal(newTotal);
   }, [checkoutCart]);
 
   useEffect(() => {
     const fetchStudentData = async () => {
+      setCheckoutCart([]);
       if (studentId) {
-        const res = await axios.get(`${BASE_URL}/students/${studentId}`);
-        setCheckoutCart([...checkoutCart, res.data.booksRented]);
+        try {
+          const res = await axios.get(`${BASE_URL}/students/${studentId}`);
+
+          if (res.data.booksRented.length > 0) {
+            res.data.booksRented.map(async (book) => {
+              const b = await axios.get(`${BASE_URL}/books/${book._id}`);
+
+              const newBook = {
+                ...b.data[0],
+                cartQuantity: book.quantity,
+              };
+              setCheckoutCart([...checkoutCart, newBook]);
+            });
+          }
+        } catch (error) {
+          alert("No student found");
+          setStudentId("");
+        }
       }
     };
     fetchStudentData();
@@ -52,7 +74,6 @@ const CheckoutPage = () => {
       });
       const data = { studentId: studentId, books: cart };
       const res = await axios.post(`${BASE_URL}/rentals`, data);
-      console.log(`Response`, res);
       setStudentId("");
       setCheckoutCart([]);
     } catch (error) {
@@ -62,10 +83,10 @@ const CheckoutPage = () => {
 
   const handleRemoveBookFromCart = async () => {};
 
-  const handleScan = async (id, sym) => {
+  const handleScan = async (id, studentId, sym) => {
     try {
-      if (id === undefined || id === "") {
-        alert("Enter book id");
+      if (id === undefined || id === "" || studentId === "") {
+        alert("Enter both ids");
         return;
       }
       const response = await axios.get(`${BASE_URL}/books/${id}`);
@@ -105,11 +126,9 @@ const CheckoutPage = () => {
     } catch (error) {}
   };
 
-  console.log("Checkout Cart:", checkoutCart); // Log the entire cart to see what data it contains
-
   return (
     <section className='h-100 h-custom'>
-      <div className='container h-100 py-5'>
+      <div className='container h-100 py-5 d-flex flex-column'>
         <MDBRow>
           <MDBCol md='6'>
             <MDBInput
@@ -131,7 +150,7 @@ const CheckoutPage = () => {
           </MDBCol>
           <MDBCol md='6'>
             <button
-              onClick={() => handleScan(bookId, "+")}
+              onClick={() => handleScan(bookId, studentId, "+")}
               type='button'
               className='btn'
               style={{
@@ -143,7 +162,7 @@ const CheckoutPage = () => {
               Add
             </button>
             <button
-              onClick={() => handleScan(bookId, "-")}
+              onClick={() => handleScan(bookId, studentId, "-")}
               type='button'
               className='btn'
               style={{
@@ -163,7 +182,7 @@ const CheckoutPage = () => {
                 <thead>
                   <tr>
                     <th scope='col' className='h5'>
-                      Shopping Bag
+                      Rent Books
                     </th>
                     <th scope='col'>Format</th>
                     <th scope='col'>Quantity</th>
@@ -262,13 +281,15 @@ const CheckoutPage = () => {
           </div>
         </div>
 
-        <button
-          onClick={handleCheckout}
-          type='submit'
-          className='btn btn-primary w-100'
-        >
-          Checkout
-        </button>
+        <div className='mt-auto'>
+          <button
+            onClick={handleCheckout}
+            type='submit'
+            className='btn btn-primary w-100'
+          >
+            Checkout
+          </button>
+        </div>
       </div>
     </section>
   );

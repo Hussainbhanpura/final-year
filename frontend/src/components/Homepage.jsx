@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "./Navbar";
 import Navbar2 from "./Navbar2";
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import { useAuth } from "./AuthController";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 function Homepage() {
   const { verifyToken } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation(); // Use useLocation to access the current URL path
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -34,9 +35,11 @@ function Homepage() {
   return (
     <div>
       <div className='App container-fluid row'>
-        <div className='col-lg-2'>
-          <Navbar2 />
-        </div>
+        {location.pathname !== "/checkout" && (
+          <div className='col-lg-2'>
+            <Navbar2 />
+          </div>
+        )}
         <div className='col-lg-10 col-md-12'>
           <Outlet />
         </div>

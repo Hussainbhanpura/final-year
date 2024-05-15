@@ -45,20 +45,23 @@ const getRentalsByStudentIsbn = async (req, res) => {
   }
 };
 
+
 const rentBook = async (req, res) => {
   const { books, studentId } = req.body;
+  console.log(books);
   try {
-    const student = await Student.find({isbn : studentId});
-      books.map(async(b)=> {
-        student[0].booksRented.push(b);
+    const student = await Student.findOne({isbn : studentId});
+    console.log(student);
+      books.map((b)=> {
+        student.booksRented.push(b);
       })
-
-    await student[0].save();
+   
+    await student.save();
 
     for (const boo of books){
-      const b = await Book.find({ isbn : boo._id});
-      b[0].quantity =b[0].quantity - boo.quantity;
-      await b[0].save(); 
+      const b = await Book.findOne({ isbn : boo._id});
+      b.quantity =b.quantity - boo.quantity;
+      await b.save(); 
     }
 
     res.status(201).json({message : "Books rented successfully"});
