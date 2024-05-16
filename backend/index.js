@@ -45,6 +45,9 @@ app.use("/rentals", rentalRoutes);
 app.post('/api/verify', verifyToken)
 app.post('/api/register', registerUser);
 app.post('/api/login', loginUser);
+app.get("/",(req,res)=>{
+  res.send("Hello World");
+})
 
 
 // Start server
