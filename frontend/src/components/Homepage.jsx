@@ -19,10 +19,16 @@ function Homepage() {
       } else {
         switch (status) {
           case 200:
-            navigate("/");
+            // Allow navigation to any URL, but redirect to home if not already on a valid path
+            if (location.pathname === "/login") {
+              navigate("/");
+            }
             break;
           case 201:
-            navigate("/checkout");
+            // Restrict navigation to only "/checkout"
+            if (location.pathname !== "/checkout") {
+              navigate("/checkout");
+            }
             break;
           default:
             navigate("/login"); // Fallback if an unexpected status code is received
@@ -30,7 +36,7 @@ function Homepage() {
       }
     };
     checkAuth();
-  }, [navigate, verifyToken]);
+  }, [navigate, verifyToken, location.pathname]);
 
   return (
     <div>

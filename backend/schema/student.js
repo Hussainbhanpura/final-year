@@ -22,7 +22,7 @@ const studentSchema = new mongoose.Schema({
     quantity : {
       type : Number,
       required : true,
-    }
+    },
   }
   ],
 });

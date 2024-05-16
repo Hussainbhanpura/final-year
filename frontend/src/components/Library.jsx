@@ -12,7 +12,6 @@ function Dashboard() {
     const fetch = async () => {
       const book = await axios.get(`${BASE_URL}/books`);
       setBooks(book);
-      console.log(`Book`, book.data);
       const student = await axios.get(`${BASE_URL}/students`);
       setStudents(student);
     };

@@ -8,15 +8,22 @@ const rentalRoutes = require("./routes/rentalRoutes");
 // const {verifyToken} = require("./controllers/verifyToken");
 const { registerUser, loginUser,verifyToken } = require('./controllers/authController');
 const cors = require("cors");
+require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   origin:"http://localhost:3000",
+}))
+
+app.use(cors({
+  origin : ["https://deploy-mern-1whq.vercel.app"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
 }))
 
 // Connect to MongoDB

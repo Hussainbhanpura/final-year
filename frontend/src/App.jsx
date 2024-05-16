@@ -12,34 +12,35 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Library from "./components/Library";
 import Checkout from "./components/Checkout";
+import RentalPage from "./components/RentalPage";
 import ShowNavbar from "./ShowNabar";
 import AuthController from "./components/AuthController";
 function App() {
   return (
     <Router>
-      <div className="App container-fluid row">
+      <div className='App container-fluid row'>
         {/* <div className="col-lg-2 col-md-12"> */}
         {/* <ShowNavbar>
             <Navbar2 />
           </ShowNavbar> */}
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/" element={<HomePage />}>
-            <Route path="" element={<Library />} />
-            <Route path="addbook" element={<AddBook />} />
-            <Route path="books" element={<BookList />} />
-            <Route path="students" element={<StudentList />} />
-            <Route path="editstudent/:id" element={<EditStudent />} />
-            <Route path="rentals" element={<RentalList />} />
-            <Route path="editbook/:id" element={<EditBook />} />
-            <Route path="checkout" element={<Checkout />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+          <Route path='/' element={<HomePage />}>
+            <Route path='' element={<Library />} />
+            <Route path='addbook' element={<AddBook />} />
+            <Route path='books' element={<BookList />} />
+            <Route path='students' element={<StudentList />} />
+            <Route path='editstudent/:id' element={<EditStudent />} />
+            <Route path='rentals' element={<RentalList />} />
+            <Route path='/rentalpage/:id' element={<RentalPage />} />
+            <Route path='editbook/:id' element={<EditBook />} />
+            <Route path='checkout' element={<Checkout />} />
           </Route>
         </Routes>
 
         {/* <div className="col-lg-10 col-md-12"> */}
       </div>
-      {/* </div> */}
     </Router>
   );
 }

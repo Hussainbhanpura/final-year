@@ -1,6 +1,10 @@
 import React from "react";
 import EditIcon from "@mui/icons-material/Edit";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
+import { useState, useEffect } from "react";
+
 import BASE_URL from "../config.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -8,6 +12,26 @@ import axios from "axios";
 function Card({ data }) {
   const token = window.localStorage.getItem("token");
   const navigate = useNavigate();
+  const [rentedBooksStatus, setRentedBooksStatus] = useState({});
+
+  useEffect(() => {
+    if (Array.isArray(data)) {
+      data.forEach(async (student) => {
+        try {
+          const res = await axios.get(`${BASE_URL}/students/${student.isbn}`);
+          setRentedBooksStatus((prevStatus) => ({
+            ...prevStatus,
+            [student.isbn]: res.data.booksRented.length > 0,
+          }));
+        } catch (error) {
+          console.error(
+            "Error fetching rental books:",
+            error.response?.data?.message
+          );
+        }
+      });
+    }
+  }, [data]);
 
   const handleDelete = async (id) => {
     const res = await axios.delete(`${BASE_URL}/students/${id}`, {
@@ -19,6 +43,10 @@ function Card({ data }) {
   };
   const handleEdit = (id) => {
     navigate(`/editstudent/${id}`);
+  };
+
+  const handleCheckRentals = (id) => {
+    navigate(`/rentalpage/${id}`);
   };
 
   return (
@@ -45,7 +73,7 @@ function Card({ data }) {
                 </div>
               </div>
             </div>
-            <table className='table table-striped table-hover'>
+            <table className='table table-bordered table-striped table-hover'>
               <thead>
                 <tr>
                   <th>Name</th>
@@ -75,9 +103,21 @@ function Card({ data }) {
                         data-toggle='modal'
                       >
                         <i>
-                          <PersonRemoveIcon />
+                          <DeleteIcon />
                         </i>
                       </a>
+                      {rentedBooksStatus[student.isbn] ? (
+                        <a
+                          onClick={() => handleCheckRentals(student.isbn)}
+                          className='btn btn-link'
+                        >
+                          <ShoppingCartIcon />
+                        </a>
+                      ) : (
+                        <a className='btn btn-link'>
+                          <RemoveShoppingCartIcon />
+                        </a>
+                      )}
                     </td>
                   </tr>
                 ))}

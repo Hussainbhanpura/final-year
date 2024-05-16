@@ -51,7 +51,8 @@ const rentBook = async (req, res) => {
   console.log(books);
   try {
     const student = await Student.findOne({isbn : studentId});
-    console.log(student);
+    student.booksRented = [];
+
       books.map((b)=> {
         student.booksRented.push(b);
       })
@@ -87,9 +88,23 @@ const returnBook = async(req,res)=> {
   }
 };
 
+const bookQuantity = async (req,res) =>{
+  const {isbn} = req.params;
+  const {quantityChange} = req.body;
+  try {
+    const book = await Book.findOne({isbn});
+    book.quantity -= quantityChange;
+    await book.save();
+    res.status(200).json({message : "Books Quantity updated"});
+  } catch (error) {
+    res.status(500).json({message : "Internal server error"});
+  }
+}
+
 module.exports = {
   getAllRentals,
   rentBook,
   getRentalsByStudentIsbn,
   returnBook,
+  bookQuantity
 };

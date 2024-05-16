@@ -1,0 +1,5 @@
+/* Assuming your buttons have specific classes or IDs */
+.btn-add:focus, .btn-return:focus {
+    border: 2px solid white; /* Sets a white border */
+    outline: none; /* Removes the default focus outline */
+  }

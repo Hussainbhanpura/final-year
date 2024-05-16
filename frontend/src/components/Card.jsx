@@ -1,6 +1,9 @@
 import React from "react";
 import EditIcon from "@mui/icons-material/Edit";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
+import { useState, useEffect } from "react";
 import BASE_URL from "../config.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -46,7 +49,7 @@ function Card({ data }) {
               </div>
             </div>
             <table className='table table-bordered table-hover table-striped'>
-              <thead className='thead-light'>
+              <thead>
                 <tr>
                   <th scope='col'>Title</th>
                   <th scope='col'>Author</th>
@@ -79,44 +82,12 @@ function Card({ data }) {
                         data-toggle='modal'
                       >
                         <i>
-                          <PersonRemoveIcon />
+                          <DeleteIcon />
                         </i>
                       </a>
                     </td>
                   </tr>
                 ))}
-
-                {/* {data.map((book, index) => (
-                  <tr key={book._id}>
-                    <td>{book.title}</td>
-                    <td> {book.author}</td>
-                    <td> {book.quantity}</td>
-                    <td>{book.price}</td>
-                    {
-                      <td>
-                        <a
-                          onClick={() => handleEdit(book.isbn)}
-                          className="edit"
-                          data-toggle="modal"
-                        >
-                          <i>
-                            <EditIcon />
-                          </i>
-                        </a>
-
-                        <a
-                          onClick={() => handleDelete(book._id)}
-                          className="delete"
-                          data-toggle="modal"
-                        >
-                          <i>
-                            <PersonRemoveIcon />
-                          </i>
-                        </a>
-                      </td>
-                    }
-                  </tr>
-                ))} */}
               </tbody>
             </table>
           </div>

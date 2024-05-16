@@ -7,6 +7,7 @@ const router = express.Router();
 router.get("/" ,rentalController.getAllRentals);
 router.get("/:isbn" ,rentalController.getRentalsByStudentIsbn);
 router.post("/", rentalController.rentBook);
+router.put("/:isbn", rentalController.bookQuantity);
 router.delete("/:isbn", rentalController.returnBook);
 
 module.exports = router;

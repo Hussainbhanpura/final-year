@@ -5,8 +5,10 @@ import { useParams } from "react-router-dom";
 import { MDBBtn, MDBIcon } from "mdb-react-ui-kit";
 import { MDBInput } from "mdb-react-ui-kit";
 import "./EditBook.css";
+import { useNavigate } from "react-router-dom";
 
 function EditBook() {
+  const navigate = useNavigate();
   const token = window.localStorage.getItem("token");
   const { id } = useParams();
   const [title, setTitle] = useState("");
@@ -47,7 +49,7 @@ function EditBook() {
           Authorization: `${token}`,
         },
       });
-      console.log(response.data); // handle successful update
+      navigate("/");
     } catch (error) {
       console.error("Update error:", error.response.data.message);
     }
@@ -60,7 +62,11 @@ function EditBook() {
           Edit Book
         </h2>
         {id && (
-          <form className='row mb-4' onSubmit={handleSubmit}>
+          <form
+            className='row mb-4'
+            onSubmit={handleSubmit}
+            style={{ height: "75vh" }}
+          >
             <div class='mt -5'>
               <MDBInput
                 type='text'
@@ -79,7 +85,7 @@ function EditBook() {
                 onChange={(e) => setAuthor(e.target.value)}
               />
             </div>
-            <div className='mt-5'>
+            <div className='col-md-6 col-lg-6 mt-5'>
               <MDBInput
                 type='number'
                 label='Quantity'
@@ -88,7 +94,7 @@ function EditBook() {
                 onChange={(e) => setQuantity(e.target.value)}
               />
             </div>
-            <div className='mt-5'>
+            <div className='col-md-6 col-lg-6 mt-5'>
               <MDBInput
                 type='number'
                 label='Price'
@@ -101,7 +107,7 @@ function EditBook() {
               <button
                 onClick={() => handleSubmit(id)}
                 type='button'
-                class='btn btn-primary'
+                className='btn btn-primary w-100'
               >
                 Update
               </button>

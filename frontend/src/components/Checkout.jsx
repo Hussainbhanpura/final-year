@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   MDBContainer,
   MDBRow,
@@ -8,13 +8,14 @@ import {
 } from "mdb-react-ui-kit";
 import axios from "axios";
 import BASE_URL from "../config.js";
+import "./Checkout.css";
 
 const cartFromLocalStorage = JSON.parse(
   window.localStorage.getItem("checkout") || "[]"
 );
 let price = 0;
-const totalfromLocalStorage = cartFromLocalStorage.map((b) => {
-  price = price + b.price * b.cartQuantity;
+cartFromLocalStorage.forEach((b) => {
+  price += b.price * b.cartQuantity;
 });
 
 const CheckoutPage = () => {
@@ -22,6 +23,79 @@ const CheckoutPage = () => {
   const [bookId, setBookId] = useState("");
   const [checkoutCart, setCheckoutCart] = useState(cartFromLocalStorage);
   const [total, setTotal] = useState(price);
+  const [debouncedStudentId, setDebouncedStudentId] = useState(studentId);
+  const [student, setStudent] = useState("");
+  const studentIdInputRef = useRef(null);
+  const bookIdInputRef = useRef(null);
+
+  // Focus on Student ID input on component mount
+  useEffect(() => {
+    if (studentIdInputRef.current) {
+      studentIdInputRef.current.focus();
+    }
+  }, []);
+
+  // Handle student ID input changes
+  const handleStudentIdChange = (e) => {
+    setStudentId(e.target.value);
+  };
+
+  // Automatically focus on Book ID input when Student ID is entered
+  useEffect(() => {
+    if (studentId.length > 0 && bookIdInputRef.current) {
+      bookIdInputRef.current.focus();
+    }
+  }, [studentId]);
+
+  useEffect(() => {
+    if (studentId.length > 0) {
+      // Assuming some validation or length check
+      bookIdInputRef.current.focus();
+    }
+
+    const handler = setTimeout(() => {
+      setDebouncedStudentId(studentId);
+    }, 1500); // 1500 ms = 1.5 seconds
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [studentId]);
+
+  // Fetch student data when debouncedStudentId changes
+  useEffect(() => {
+    if (debouncedStudentId) {
+      fetchStudentData();
+    }
+  }, [debouncedStudentId]);
+
+  const fetchStudentData = async () => {
+    setCheckoutCart([]);
+    if (debouncedStudentId) {
+      try {
+        const res = await axios.get(
+          `${BASE_URL}/students/${debouncedStudentId}`
+        );
+
+        if (res.data.booksRented.length > 0) {
+          setStudent(res.data.name);
+          res.data.booksRented.forEach(async (book) => {
+            const b = await axios.get(`${BASE_URL}/books/${book._id}`);
+            b.data[0].quantity += book.quantity;
+
+            const newBook = {
+              ...b.data[0],
+              cartQuantity: book.quantity,
+            };
+            setCheckoutCart((prevCart) => [...prevCart, newBook]);
+          });
+        }
+      } catch (error) {
+        alert("No student found");
+        setStudentId("");
+      }
+    }
+  };
 
   useEffect(() => {
     window.localStorage.setItem("checkout", JSON.stringify(checkoutCart));
@@ -32,48 +106,18 @@ const CheckoutPage = () => {
     setTotal(newTotal);
   }, [checkoutCart]);
 
-  useEffect(() => {
-    const fetchStudentData = async () => {
-      setCheckoutCart([]);
-      if (studentId) {
-        try {
-          const res = await axios.get(`${BASE_URL}/students/${studentId}`);
-
-          if (res.data.booksRented.length > 0) {
-            res.data.booksRented.map(async (book) => {
-              const b = await axios.get(`${BASE_URL}/books/${book._id}`);
-
-              const newBook = {
-                ...b.data[0],
-                cartQuantity: book.quantity,
-              };
-              setCheckoutCart([...checkoutCart, newBook]);
-            });
-          }
-        } catch (error) {
-          alert("No student found");
-          setStudentId("");
-        }
-      }
-    };
-    fetchStudentData();
-  }, [studentId]);
-
   const handleCheckout = async () => {
     if (studentId === "" || checkoutCart.length < 1) {
-      alert("Student Id and book Id must be provided");
+      alert("Student ID and book ID must be provided");
       return;
     }
     try {
-      const cart = [];
-      checkoutCart.map((check) => {
-        cart.push({
-          _id: check.isbn,
-          quantity: check.cartQuantity,
-        });
-      });
-      const data = { studentId: studentId, books: cart };
-      const res = await axios.post(`${BASE_URL}/rentals`, data);
+      const cart = checkoutCart.map((check) => ({
+        _id: check.isbn,
+        quantity: check.cartQuantity,
+      }));
+      const data = { studentId, books: cart };
+      await axios.post(`${BASE_URL}/rentals`, data);
       setStudentId("");
       setCheckoutCart([]);
     } catch (error) {
@@ -81,217 +125,170 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleRemoveBookFromCart = async () => {};
-
   const handleScan = async (id, studentId, sym) => {
     try {
-      if (id === undefined || id === "" || studentId === "") {
-        alert("Enter both ids");
+      if (!id || !studentId) {
+        alert("Enter both IDs");
         return;
       }
       const response = await axios.get(`${BASE_URL}/books/${id}`);
       setBookId("");
+      const bookData = response.data[0];
       const existingCart = checkoutCart.find(
-        (book) => book._id === response.data[0]._id
+        (book) => book._id === bookData._id
       );
+
       if (existingCart) {
         if (sym === "+") {
           existingCart.cartQuantity++;
+        } else if (existingCart.cartQuantity > 1) {
+          existingCart.cartQuantity--;
         } else {
-          if (existingCart.cartQuantity > 1) {
-            existingCart.cartQuantity--;
-            setCheckoutCart([...checkoutCart]);
-          } else {
-            setCheckoutCart(
-              checkoutCart.filter((book) => book._id !== existingCart._id)
-            );
-          }
+          setCheckoutCart(
+            checkoutCart.filter((book) => book._id !== existingCart._id)
+          );
+          return;
         }
+        setCheckoutCart([...checkoutCart]);
+      } else if (sym === "+") {
+        const newCartItem = { ...bookData, cartQuantity: 1 };
+        setCheckoutCart([...checkoutCart, newCartItem]);
       } else {
-        if (sym === "+") {
-          const newCartItem = {
-            ...response.data[0],
-            cartQuantity: 1,
-          };
-          setCheckoutCart([...checkoutCart, newCartItem]);
-        } else {
-          alert("Book not found in cart");
-        }
+        alert("Book not found in cart");
+        return;
       }
-      if (sym === "+") {
-        setTotal(total + response.data[0].price);
-      } else {
-        setTotal(total - response.data[0].price);
-      }
-    } catch (error) {}
+
+      const newTotal = total + (sym === "+" ? bookData.price : -bookData.price);
+      setTotal(newTotal);
+
+      await updateBookQuantity(bookData.isbn, sym === "+" ? 1 : -1);
+    } catch (error) {
+      alert("Error scanning book");
+    }
+  };
+
+  const updateBookQuantity = async (bookId, quantityChange) => {
+    try {
+      await axios.put(`${BASE_URL}/rentals/${bookId}`, {
+        quantityChange,
+      });
+    } catch (error) {
+      alert("Error updating book quantity in database");
+    }
   };
 
   return (
-    <section className='h-100 h-custom'>
-      <div className='container h-100 py-5 d-flex flex-column'>
-        <MDBRow>
-          <MDBCol md='6'>
-            <MDBInput
-              label='Student ID'
-              id='studentId'
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-            />
-          </MDBCol>
-        </MDBRow>
-        <MDBRow>
-          <MDBCol md='6'>
-            <MDBInput
-              label='Book ID'
-              id='bookId'
-              value={bookId}
-              onChange={(e) => setBookId(e.target.value)}
-            />
-          </MDBCol>
-          <MDBCol md='6'>
-            <button
-              onClick={() => handleScan(bookId, studentId, "+")}
-              type='button'
-              className='btn'
-              style={{
-                backgroundColor: "#4bc0d1",
-                color: "white",
-                margin: "10px",
-              }}
-            >
-              Add
-            </button>
-            <button
-              onClick={() => handleScan(bookId, studentId, "-")}
-              type='button'
-              className='btn'
-              style={{
-                backgroundColor: "#f76c6c",
-                color: "white",
-                margin: "10px",
-              }}
-            >
-              Return
-            </button>
-          </MDBCol>
-        </MDBRow>
-        <div className='row d-flex justify-content-start align-items-top h-70'>
-          <div className='col'>
-            <div className='table-responsive'>
-              <table className='table'>
-                <thead>
-                  <tr>
-                    <th scope='col' className='h5'>
-                      Rent Books
-                    </th>
-                    <th scope='col'>Format</th>
-                    <th scope='col'>Quantity</th>
-                    <th scope='col'>Price</th>
+    <MDBContainer className='py-5'>
+      <MDBRow className='mb-4'>
+        <MDBCol md='6'>
+          <MDBInput
+            label='Student ID'
+            id='studentId'
+            value={studentId}
+            onChange={handleStudentIdChange}
+            className='mb-3'
+            ref={studentIdInputRef}
+          />
+        </MDBCol>
+        <MDBCol md='6'>
+          <p style={{ color: "blue", fontSize: "18px", fontWeight: "bold" }}>
+            {student ? student : null}
+          </p>
+        </MDBCol>
+      </MDBRow>
+      <MDBRow className='mb-4'>
+        <MDBCol md='6'>
+          <MDBInput
+            label='Book ID'
+            id='bookId'
+            value={bookId}
+            onChange={(e) => setBookId(e.target.value)}
+            className='mb-3'
+            ref={bookIdInputRef}
+          />
+        </MDBCol>
+        <MDBCol md='6' className='d-flex align-items-center'>
+          <button
+            className='btn me-2 btn-add'
+            onClick={() => handleScan(bookId, studentId, "+")}
+            style={{ backgroundColor: "#4bc0d1", color: "white" }}
+          >
+            Add
+          </button>
+          <button
+            className='btn btn-return'
+            onClick={() => handleScan(bookId, studentId, "-")}
+            style={{ backgroundColor: "#f76c6c", color: "white" }}
+          >
+            Return
+          </button>
+        </MDBCol>
+      </MDBRow>
+      <MDBRow>
+        <MDBCol>
+          <div className='table-responsive'>
+            <table className='table table-bordered'>
+              <thead className='bg-primary text-white'>
+                <tr>
+                  <th scope='col'>Rent Books</th>
+                  <th scope='col'>Format</th>
+                  <th scope='col'>Quantity</th>
+                  <th scope='col'>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {checkoutCart.map((book) => (
+                  <tr key={book.id}>
+                    <td>
+                      <div className='d-flex align-items-center'>
+                        <div className='flex-column'>
+                          <p className='mb-2'>{book.title}</p>
+                          <p className='mb-0 text-muted'>{book.author}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Paperback</td>
+                    <td>
+                      <input
+                        id='form1'
+                        min={0}
+                        name='quantity'
+                        value={book.cartQuantity}
+                        type='text'
+                        className='form-control form-control-sm'
+                        style={{ width: 50 }}
+                        readOnly
+                      />
+                    </td>
+                    <td>${book.price}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {checkoutCart.map((book) => (
-                    <tr key={book.id}>
-                      <th scope='row'>
-                        <div className='d-flex align-items-center'>
-                          {/* <img
-                            src="https://i.imgur.com/2DsA49b.webp"
-                            className="img-fluid rounded-3"
-                            style={{ width: 120 }}
-                            alt="Book"
-                          /> */}
-                          <div className='flex-column ms-4'>
-                            <p className='mb-2'>{book.title}</p>
-                            <p className='mb-0'>{book.author}</p>
-                          </div>
-                        </div>
-                      </th>
-                      <td className='align-middle'>
-                        <p className='mb-0' style={{ fontWeight: 500 }}>
-                          Paperback
-                        </p>
-                      </td>
-                      <td className='align-middle'>
-                        <div className='d-flex flex-row'>
-                          {/* <button
-                            data-mdb-button-init
-                            data-mdb-ripple-init
-                            className='btn btn-link px-2'
-                            onClick={() => decreaseQuantity(book._id)}
-                          >
-                            <i className='fa fas fa-minus' />
-                          </button> */}
-                          <input
-                            id='form1'
-                            min={0}
-                            name='quantity'
-                            value={book.cartQuantity}
-                            type='text'
-                            className='form-control form-control-sm'
-                            style={{ width: 50 }}
-                          />
-                          {/* <button
-                            data-mdb-button-init
-                            data-mdb-ripple-init
-                            className='btn btn-link px-2'
-                            onClick={() => increaseQuantity(book._id)}
-                          >
-                            <i className='fa fas fa-plus' />
-                          </button> */}
-                        </div>
-                      </td>
-                      <td className='align-middle'>
-                        <p className='mb-0' style={{ fontWeight: 500 }}>
-                          {book.price}
-                        </p>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div
-              className='card shadow-2-strong mb-5 mb-lg-0'
-              style={{ borderRadius: 16 }}
-            ></div>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div className='col-lg-4 col-xl-3'>
-            <div
-              className='d-flex justify-content-between'
-              style={{ fontWeight: 500 }}
-            >
-              <p className='mb-2'>Subtotal</p>
+        </MDBCol>
+        <MDBCol lg='4' xl='3' className='mt-4 mt-lg-0'>
+          <div className='p-3 shadow-2-strong' style={{ borderRadius: 16 }}>
+            <div className='d-flex justify-content-between mb-2'>
+              <p className='mb-2 fw-bold'>Subtotal</p>
               <p className='mb-2'>${total}</p>
             </div>
-            <div
-              className='d-flex justify-content-between'
-              style={{ fontWeight: 500 }}
-            >
-              <p className='mb-0'>Shipping</p>
+            <div className='d-flex justify-content-between mb-2'>
+              <p className='mb-0 fw-bold'>Shipping</p>
               <p className='mb-0'>$0</p>
             </div>
             <hr className='my-4' />
-            <div
-              className='d-flex justify-content-between mb-4'
-              style={{ fontWeight: 500 }}
-            >
-              <p className='mb-2'>Total (tax included)</p>
+            <div className='d-flex justify-content-between mb-4'>
+              <p className='mb-2 fw-bold'>Total (tax included)</p>
               <p className='mb-2'>${total}</p>
             </div>
+            <button onClick={handleCheckout} className='btn btn-success w-100'>
+              Checkout
+            </button>
           </div>
-        </div>
-
-        <div className='mt-auto'>
-          <button
-            onClick={handleCheckout}
-            type='submit'
-            className='btn btn-primary w-100'
-          >
-            Checkout
-          </button>
-        </div>
-      </div>
-    </section>
+        </MDBCol>
+      </MDBRow>
+    </MDBContainer>
   );
 };
 
