@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
-import { useState, useEffect } from "react";
+import "./Card.css";
 
 import BASE_URL from "../config.js";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,8 @@ function Card({ data }) {
   const token = window.localStorage.getItem("token");
   const navigate = useNavigate();
   const [rentedBooksStatus, setRentedBooksStatus] = useState({});
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
     if (Array.isArray(data)) {
@@ -49,8 +51,44 @@ function Card({ data }) {
     navigate(`/rentalpage/${id}`);
   };
 
+  const handleDeleteClick = (id) => {
+    setDeleteId(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteId) {
+      const res = await axios.delete(`${BASE_URL}/students/${deleteId}`, {
+        headers: {
+          Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+        },
+      });
+      setShowDeleteModal(false);
+      window.location.reload();
+    }
+  };
+
+  const DeleteConfirmationModal = () => (
+    <div className='modal'>
+      <div className='modal-content'>
+        <h4>Confirm Deletion</h4>
+        <p>Are you sure you want to delete this book?</p>
+        <button onClick={confirmDelete} className='button button-delete'>
+          Delete
+        </button>
+        <button
+          onClick={() => setShowDeleteModal(false)}
+          className='button button-cancel'
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div>
+      {showDeleteModal && <DeleteConfirmationModal />}
       <div className='container'>
         <div className='table-responsive'>
           <div className='table-wrapper'>
@@ -98,7 +136,7 @@ function Card({ data }) {
                       </a>
 
                       <a
-                        onClick={() => handleDelete(student._id)}
+                        onClick={() => handleDeleteClick(student._id)}
                         className='btn btn-link delete'
                         data-toggle='modal'
                       >

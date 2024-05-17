@@ -9,33 +9,35 @@ const RentalPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      const fetchRentalBooks = async () => {
-        try {
-          // const response = await axios.get(`${BASE_URL}/rentals/${id}`);
-          const res = await axios.get(`${BASE_URL}/students/${id}`);
-          if (res.data.booksRented.length > 0) {
-            res.data.booksRented.map(async (book) => {
-              const b = await axios.get(`${BASE_URL}/books/${book._id}`);
-
-              const newBook = {
-                ...b.data[0],
-                cartQuantity: book.quantity,
-              };
-              setRentalBooks([...rentalBooks, newBook]);
-            });
-          }
-          setIsLoading(false);
-        } catch (error) {
-          console.error(
-            "Error fetching rental books:",
-            error.response?.data?.message
+    const fetchRentalBooks = async () => {
+      if (!id) return;
+      setIsLoading(true);
+      try {
+        const res = await axios.get(`${BASE_URL}/students/${id}`);
+        const booksRented = res.data.booksRented;
+        if (booksRented.length > 0) {
+          const bookDetailsPromises = booksRented.map((book) =>
+            axios.get(`${BASE_URL}/books/${book._id}`)
           );
-          setIsLoading(false);
+          const booksDetailsResponses = await Promise.all(bookDetailsPromises);
+          const newBooks = booksDetailsResponses.map((b, index) => ({
+            ...b.data[0],
+            cartQuantity: booksRented[index].quantity,
+          }));
+          setRentalBooks(newBooks);
+        } else {
+          setRentalBooks([]);
         }
-      };
-      fetchRentalBooks();
-    }
+      } catch (error) {
+        console.error(
+          "Error fetching rental books:",
+          error.response?.data?.message
+        );
+      }
+      setIsLoading(false);
+    };
+
+    fetchRentalBooks();
   }, [id]);
 
   return (

@@ -56,8 +56,8 @@ function Navbar2() {
               </li>
               &nbsp;{/* add a space between groups */}
               <li className='nav-item'>
-                <a className='nav-link' aria-current='page' href='/dashboard'>
-                  Dashboards
+                <a className='nav-link' aria-current='page' href='/checkout'>
+                  Checkout
                 </a>
               </li>
               <li className='nav-item'>

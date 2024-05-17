@@ -42,20 +42,20 @@ const CheckoutPage = () => {
 
   // Automatically focus on Book ID input when Student ID is entered
   useEffect(() => {
-    if (studentId.length > 0 && bookIdInputRef.current) {
+    if (studentId.length > 5 && bookIdInputRef.current) {
       bookIdInputRef.current.focus();
     }
   }, [studentId]);
 
   useEffect(() => {
-    if (studentId.length > 0) {
+    if (studentId.length > 5) {
       // Assuming some validation or length check
       bookIdInputRef.current.focus();
     }
 
     const handler = setTimeout(() => {
       setDebouncedStudentId(studentId);
-    }, 1500); // 1500 ms = 1.5 seconds
+    }, 500); // 1500 ms = 1.5 seconds
 
     return () => {
       clearTimeout(handler);
@@ -76,12 +76,10 @@ const CheckoutPage = () => {
         const res = await axios.get(
           `${BASE_URL}/students/${debouncedStudentId}`
         );
-
+        setStudent(res.data.name);
         if (res.data.booksRented.length > 0) {
-          setStudent(res.data.name);
           res.data.booksRented.forEach(async (book) => {
             const b = await axios.get(`${BASE_URL}/books/${book._id}`);
-            b.data[0].quantity += book.quantity;
 
             const newBook = {
               ...b.data[0],
@@ -92,6 +90,7 @@ const CheckoutPage = () => {
         }
       } catch (error) {
         alert("No student found");
+        studentIdInputRef.current.focus();
         setStudentId("");
       }
     }
