@@ -7,22 +7,15 @@ import EditStudent from "./components/EditStudent";
 import RentalList from "./components/RentalList";
 import HomePage from "./components/Homepage";
 import EditBook from "./components/EditBook";
-import Navbar2 from "./components/Navbar2";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Library from "./components/Library";
 import Checkout from "./components/Checkout";
 import RentalPage from "./components/RentalPage";
-import ShowNavbar from "./ShowNabar";
-import AuthController from "./components/AuthController";
 function App() {
   return (
     <Router>
       <div className='App container-fluid row'>
-        {/* <div className="col-lg-2 col-md-12"> */}
-        {/* <ShowNavbar>
-            <Navbar2 />
-          </ShowNavbar> */}
         <Routes>
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
@@ -38,8 +31,6 @@ function App() {
             <Route path='checkout' element={<Checkout />} />
           </Route>
         </Routes>
-
-        {/* <div className="col-lg-10 col-md-12"> */}
       </div>
     </Router>
   );

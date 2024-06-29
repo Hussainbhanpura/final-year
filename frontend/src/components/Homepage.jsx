@@ -18,19 +18,17 @@ function Homepage() {
       } else {
         switch (status) {
           case 200:
-            // Allow navigation to any URL, but redirect to home if not already on a valid path
             if (location.pathname === "/login") {
               navigate("/");
             }
             break;
           case 201:
-            // Restrict navigation to only "/checkout"
             if (location.pathname !== "/checkout") {
               navigate("/checkout");
             }
             break;
           default:
-            navigate("/login"); // Fallback if an unexpected status code is received
+            navigate("/login");
         }
       }
     };

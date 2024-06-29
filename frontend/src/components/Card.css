@@ -107,3 +107,23 @@
   .button-cancel:hover {
     background-color: #f8f9fa; /* Light grey for hover */
   }
+
+  .custom-table-responsive {
+    width: 100%;
+    overflow-x: auto; /* Allows table to scroll horizontally on small screens */
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    text-align: left;
+    padding: 8px;
+    border: 1px solid #ddd; /* Optional for styling */
+  }
+  
+  thead {
+    background-color: #f4f4f4; /* Optional for styling */
+  }

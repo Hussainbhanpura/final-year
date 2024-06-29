@@ -101,7 +101,7 @@ function Card({ data }) {
                 </div>
                 <div className='col-xs-6'>
                   <a
-                    href='/addstudent'
+                    href='/register'
                     className='btn btn-success'
                     data-toggle='modal'
                   >

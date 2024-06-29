@@ -32,3 +32,9 @@
   color: #ffffff;
   background-color: #007bff;
 }
+@media (max-width: 1024px) { /* Adjust the max-width to 1024px for tablet devices */
+  .navbar-custom {
+    height: auto; /* Set height to auto for mobile and tablet */
+    min-height: 0; /* Override any existing min-height */
+  }
+}

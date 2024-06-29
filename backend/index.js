@@ -19,13 +19,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   origin:"http://localhost:3000",
 }))
-
-app.use(cors({
-  origin : ["https://deploy-mern-1whq.vercel.app"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}))
-
 // Connect to MongoDB
 mongoose
   .connect(
